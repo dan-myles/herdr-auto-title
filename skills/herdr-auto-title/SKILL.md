@@ -1,11 +1,11 @@
 ---
 name: herdr-auto-title
-description: MUST run this skill's scripts/set-tab-title.sh to rename the Herdr tab hosting this agent (requires HERDR_ENV=1) to a 3-6 word summary of the current work. Invoke BEFORE the first tool call of every new user request, at each phase change (investigating -> implementing -> debugging -> testing -> reviewing), on completion ("Done: <what shipped>"), and when blocked ("Waiting: <what you need>"). Do NOT invoke for individual tool calls inside a single phase. The script is idempotent and cheap - when unsure whether a change is big enough, invoke it. Main interactive agent only; subagents and background workers MUST skip. Not for controlling other panes, tabs, or agents; use the herdr skill for that.
+description: "MUST run this skill's scripts/set-tab-title.sh to rename the Herdr tab hosting this agent (requires HERDR_ENV=1) to a 3-6 word summary of the current work. Invoke BEFORE the first tool call of every new user request, at each phase change (investigating -> implementing -> debugging -> testing -> reviewing), on completion ('Done: <what shipped>'), and when blocked ('Waiting: <what you need>'). Do NOT invoke for individual tool calls inside a single phase. The script is idempotent and cheap - when unsure whether a change is big enough, invoke it. Main interactive agent only; subagents and background workers MUST skip. Not for controlling other panes, tabs, or agents; use the herdr skill for that."
 license: MIT
 compatibility: Requires the Herdr CLI (herdr 0.9+) in PATH, HERDR_ENV=1 in the calling pane, POSIX sh, and jq for the bundled script.
 metadata:
   author: dan-myles
-  version: "1.1"
+  version: "1.2"
 ---
 
 # Herdr auto title
