@@ -1,6 +1,6 @@
 ---
 name: herdr-auto-title
-description: Rename the Herdr tab that hosts this interactive coding agent to a short 3-6 word summary of the current task. Use when running inside Herdr (HERDR_ENV=1) at the start of a task, when the task's objective changes meaningfully, or when the user asks to rename or stop renaming the tab. Not for controlling other panes, tabs, or agents; use the herdr skill for that.
+description: Keep the Herdr tab that hosts this interactive coding agent titled with a short 3-6 word summary of what it is doing right now. Use whenever running inside Herdr (HERDR_ENV=1) - on every new user request, whenever the task, phase, or focus changes, and when the user asks to rename or stop renaming the tab. Not for controlling other panes, tabs, or agents; use the herdr skill for that.
 license: MIT
 compatibility: Requires the Herdr CLI (herdr 0.9+) in PATH, HERDR_ENV=1 in the calling pane, POSIX sh, and jq for the bundled script.
 metadata:
@@ -39,14 +39,30 @@ If `HERDR_AUTO_TITLE` is `0`, `off`, `false`, or `no`, the user opted out for th
 The installed binary is the authority on syntax. If a command below does not match your
 version, run `herdr --skill` and `herdr tab`, then adapt; never guess IDs or flags.
 
+## When to call it
+
+Call it often. The script is idempotent and cheap (one Herdr round trip, no-op when the
+title is unchanged), so err on the side of calling it rather than wondering. Call it:
+
+- At the start of every user request, before the first tool call of the work.
+- Every time the user sends a new message that starts, redirects, or narrows the work.
+- When you move to a distinct phase of the same task: investigating -> implementing ->
+  debugging a failure -> writing tests -> reviewing -> committing. Phase titles are fine:
+  `Debug failing auth tests`, `Review upload retry diff`.
+- When the subject changes within a task: a different subsystem, file group, repo, or bug.
+- When you finish and go idle: `Done: <what shipped>` (for example `Done: S3 upload retries`)
+  so the user can see finished tabs at a glance.
+- When you are blocked waiting on the user: `Waiting: <what you need>`.
+
+Skip only for individual tool calls inside one phase (each file read, each test run,
+each edit). If in doubt, call it.
+
 ## Choose the title
 
 - 3-6 words, imperative or noun phrase, no trailing punctuation:
   `Fix login redirect loop`, `Add S3 upload retries`, `Investigate flaky auth tests`.
-- Describe the user's objective, not the current tool call or phase.
-- Retitle at task start and when the objective changes (new feature, unrelated bug,
-  different repo). Do not retitle for read-only investigation steps, test runs, commits,
-  or sub-steps of the same task.
+- Describe what you are doing now, specific enough that two tabs on the same repo
+  read differently.
 - Never include secrets, tokens, URLs with credentials, private names, or pasted user
   content. If the task itself is about a credential, describe it generically
   (`Rotate deploy token`).
@@ -112,7 +128,8 @@ equals what you sent.
 
 ## Never
 
-- Rename from a subagent, a hook, or a loop; one call per objective change.
+- Rename from a subagent, a hook, or a polling loop; calls come from your own decision
+  points (new request, phase change, done, blocked), not a timer.
 - Use `herdr tab focus`, `pane split`, `pane move`, or any command other than
   `pane current`, `tab get`, `pane list`, and `tab rename` while titling.
 - Rename tabs other than the caller's, workspaces, panes, or agents.

@@ -14,7 +14,9 @@ this skill is a separate, narrow, opt-in behavior.
   it does nothing and never looks for another session.
 - Targets the tab that hosts the calling agent, resolved live through
   `herdr pane current --current`, never the focused tab.
-- Renames at task start and when the objective changes, not on every tool call.
+- Renames early and often: at every new user request, on each phase change
+  (investigate -> implement -> debug -> test -> review), when done (`Done: ...`), and when
+  blocked (`Waiting: ...`). Not per tool call. Repeat calls with the same title are no-ops.
 - Preserves labels it did not set: Herdr's default numeric label and titles it wrote
   earlier are replaceable; anything the user typed is left alone unless the user asks.
 - Stays quiet in shared tabs: if another recognized agent occupies a pane in the same
@@ -77,8 +79,10 @@ Add the following to an existing instruction file; do not replace what is alread
 **OMP** — `~/.omp/agent/RULES.md` is sticky (re-attached near every turn). Append:
 
 ```markdown
-When HERDR_ENV=1 and you are the main interactive agent, apply the herdr-auto-title
-skill at task start and when the objective changes. Subagents never rename the tab.
+When HERDR_ENV=1 and you are the main interactive agent, keep the tab title current with
+the herdr-auto-title skill: call its set-tab-title.sh at the start of every user request,
+whenever the task or phase changes, when you finish (Done: ...), and when you are waiting
+on the user (Waiting: ...). Subagents never rename the tab.
 ```
 
 **Claude Code** — append the same lines to `~/.claude/CLAUDE.md` (user instructions,
